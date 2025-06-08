@@ -1,1 +1,1 @@
-web: gunicorn -b 0.0.0.0:8080 ptt_notifier:app
+web: gunicorn -b 0.0.0.0:$PORT ptt_notifier:app
