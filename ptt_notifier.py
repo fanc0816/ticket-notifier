@@ -1,4 +1,3 @@
-
 import requests
 from bs4 import BeautifulSoup
 import threading
@@ -24,7 +23,10 @@ def send_telegram_message(text):
         "text": text,
         "disable_web_page_preview": True
     }
-    requests.post(API_URL, data=payload)
+    try:
+        requests.post(API_URL, data=payload)
+    except Exception as e:
+        print(f"⚠️ Telegram 傳送訊息失敗: {e}")
 
 def fetch_articles():
     base_url = "https://www.ptt.cc"
@@ -55,8 +57,10 @@ def crawler_loop():
             print(f"🔗 {link}\n")
             send_telegram_message(f"🎫 {title}\n🔗 {link}")
     print(f"⏳ {CHECK_INTERVAL} 秒後再次檢查...\n")
-    # 用 Timer 安排下一次執行
     threading.Timer(CHECK_INTERVAL, crawler_loop).start()
+
+# **把爬蟲執行緒放在全域，確保Gunicorn啟動也會執行**
+threading.Thread(target=crawler_loop, daemon=True).start()
 
 @app.route("/")
 def home():
@@ -64,6 +68,4 @@ def home():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
-    # 啟動 crawler_loop 背景執行（第一次啟動）
-    threading.Thread(target=crawler_loop, daemon=True).start()
     app.run(host="0.0.0.0", port=port)
