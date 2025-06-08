@@ -10,7 +10,7 @@ app = Flask(__name__)
 KEYWORDS = ["理想混蛋"]
 PAGES = 3
 BOARD = "Drama-Ticket"
-CHECK_INTERVAL = 300  # 秒
+CHECK_INTERVAL = 60  # 秒
 
 # Telegram 設定
 TELEGRAM_TOKEN = "8130782294:AAHoPu2Po5TdP7oB6ztAj5Y6SwzFciNvcOU"
