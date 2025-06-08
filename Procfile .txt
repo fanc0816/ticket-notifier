@@ -1,1 +1,1 @@
-python3 ptt_notifier.py
+web: python3 ptt_notifier.py
