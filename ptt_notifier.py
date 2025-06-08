@@ -1,18 +1,17 @@
+
 import requests
 from bs4 import BeautifulSoup
-import time
 import threading
 from flask import Flask
+import os
 
 app = Flask(__name__)
 
-# 設定區
 KEYWORDS = ["理想混蛋"]
 PAGES = 3
 BOARD = "Drama-Ticket"
 CHECK_INTERVAL = 60  # 秒
 
-# Telegram 設定
 TELEGRAM_TOKEN = "8130782294:AAHoPu2Po5TdP7oB6ztAj5Y6SwzFciNvcOU"
 CHAT_ID = "8094404595"
 API_URL = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -48,26 +47,23 @@ def fetch_articles():
 
 def crawler_loop():
     print("🚀 開始監控 PTT 演唱會票...")
-    while True:
-        new_articles = fetch_articles()
-        for title, link in new_articles:
-            if link not in notified_links:
-                notified_links.add(link)
-                print(f"📢 新文章：{title}")
-                print(f"🔗 {link}\n")
-                send_telegram_message(f"🎫 {title}\n🔗 {link}")
-        print(f"⏳ 等待 {CHECK_INTERVAL} 秒後再次檢查...\n")
-        time.sleep(CHECK_INTERVAL)
-
-# 啟動背景爬蟲執行緒（daemon=True，不阻塞主程式）
-threading.Thread(target=crawler_loop, daemon=True).start()
+    new_articles = fetch_articles()
+    for title, link in new_articles:
+        if link not in notified_links:
+            notified_links.add(link)
+            print(f"📢 新文章：{title}")
+            print(f"🔗 {link}\n")
+            send_telegram_message(f"🎫 {title}\n🔗 {link}")
+    print(f"⏳ {CHECK_INTERVAL} 秒後再次檢查...\n")
+    # 用 Timer 安排下一次執行
+    threading.Timer(CHECK_INTERVAL, crawler_loop).start()
 
 @app.route("/")
 def home():
     return "PTT Ticket Notifier is running."
 
 if __name__ == "__main__":
-    # Railway 通常會用 PORT 環境變數，建議讀取設定
-    import os
     port = int(os.environ.get("PORT", 8080))
+    # 啟動 crawler_loop 背景執行（第一次啟動）
+    threading.Thread(target=crawler_loop, daemon=True).start()
     app.run(host="0.0.0.0", port=port)
