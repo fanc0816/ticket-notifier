@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import time
 
 # 設定區
-KEYWORDS = ["理想混蛋", "演唱會", "門票"]
+KEYWORDS = ["理想混蛋"]
 PAGES = 3  # 要爬的頁數
 BOARD = "Drama-Ticket"
 CHECK_INTERVAL = 300  # 每幾秒檢查一次（例如 300 秒 = 5 分鐘）
